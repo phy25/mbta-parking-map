@@ -52,6 +52,7 @@ module.exports = {
         }),
         new HtmlWebpackPlugin({
             title: 'MBTA Parking Map',
+            description: 'Visualize transit-friendly parking lots by rate and capacity.',
             template: 'src/index.ejs.html',
             favicon: 'src/icon.png',
             meta: {

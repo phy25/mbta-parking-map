@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title><%= htmlWebpackPlugin.options.title %></title>
-    <meta name="description" content="Visualize transit-friendly parking lots by rate and capacity."/>
+    <meta name="description" content="<%= htmlWebpackPlugin.options.description %>" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:site" content="@phy25" />
+    <meta name="twitter:title" content="<%= htmlWebpackPlugin.options.title %>" />
+    <meta name="twitter:description" content="<%= htmlWebpackPlugin.options.description %>" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://api.mapbox.com" />
@@ -61,7 +66,7 @@
     <div id="map-container" style="display: none;">
       <div id="map"></div>
       <div id="map-loading" aria-busy="true" aria-live="polite" aria-label="Loading MBTA Parking Map">
-        <h1>MBTA Parking Map</h1>
+        <h1><%= htmlWebpackPlugin.options.title %></h1>
         <p><span class="span-block">Visualize transit-friendly parking lots</span> <span class="span-block">by rate and capacity</span></p>
       </div>
     </div>
