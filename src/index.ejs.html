@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta name="description" content="Visualize transit-friendly parking lots by rate and capacity."/>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://api.mapbox.com" />
+    <link rel="preload" href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" as="style" onload="this.onload=null;this.rel='stylesheet'" />
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js" defer></script>
+  </head>
+  <body>
+    <div id="panel-container">
+      <div id="panel" tabindex="0" role="region" aria-label="Options">
+        <form id="form-options">
+          <div style="display: flex; flex-wrap: wrap; gap: 1em 3em;">
+            <div>
+              <label for="cluster-color">Cluster color&emsp14;/&emsp14;text</label>
+              <div style="display: flex; flex-direction: column;">
+                <label><input type="radio" name="cluster-color" value="daily_rate_max" checked /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
+                <label><input type="radio" name="cluster-color" value="daily_rate_min" /> Average low daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
+                <label><input type="radio" name="cluster-color" value="capacity" /> Sum capacity</label>
+              </div>
+              <div id="cluster-color-bar" style="margin-bottom: 1em;"></div>
+              <label for="cluster-size">Cluster size</label>
+              <div style="display: flex; flex-direction: column;">
+                <label><input type="radio" name="cluster-size" value="daily_rate_max" /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
+                <label><input type="radio" name="cluster-size" value="daily_rate_min" /> Average low daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
+                <label><input type="radio" name="cluster-size" value="capacity" checked /> Sum capacity</label>
+              </div>
+            </div>
+            <div>
+              <div style="display: flex; flex-direction: column; margin-bottom: 1em;">
+                <label><input type="checkbox" name="include-lt-20-capacity" /> Include &lt;20 spaces</label>
+                <label><input type="checkbox" name="include-hourly-rate" checked /> Include hourly rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">^</a></label>
+              </div>
+              <div>
+                <label for="lines">Lines <button id="lines-select-all" style="margin-left: 0.5em;">Select All</button></label>
+                <select id="lines" name="lines" multiple style="min-height: 5em; height: 7.5em; min-width: 15em; resize: vertical;"></select>
+              </div>
+              <p style="margin: 1em 0 0; font-size: 0.9em;"><em>Showing <span id="facilities-counter">…</span> daily public parking</em></p>
+            </div>
+          </div>
+        </form>
+
+        <hr color="#CCC">
+        <footer>
+          <p id="footnote-daily-rate">* The daily rate is extracted from the unstructured rate explainer text, and thus may include weekend rate or hourly rate (marked with ^).</p>
+          <p>
+            Data from <a target="_blank" href="https://www.mbta.com/developers/v3-api">MassDOT</a>.
+            Logo based on <a target="_blank" href="https://www.flaticon.com/premium-icon/parking-area_3210158" title="car parking icon">work by vectorsmarket15</a>.
+            Integrated by <a href="https://phy25.com/">Phy25</a> &#129322; on <a href="">GitHub</a>.
+          </p>
+        </footer>
+      </div>
+      <div id="panel-handle">
+        <button id="panel-handle-button" title="Expand options"></button>
+      </div>
+    </div>
+    <div id="map-container" style="display: none;">
+      <div id="map"></div>
+      <div id="map-loading" aria-busy="true" aria-live="polite" aria-label="Loading MBTA Parking Map">
+        <h1>MBTA Parking Map</h1>
+        <p><span class="span-block">Visualize transit-friendly parking lots</span> <span class="span-block">by rate and capacity</span></p>
+      </div>
+    </div>
+    <footer class="print-only-block">
+      <p>
+        Data from <a target="_blank" href="https://www.mbta.com/developers/v3-api">MassDOT</a>.
+        Integrated by <a href="https://phy25.com/">Phy25</a> &#129322;.
+      </p>
+    </footer>
+  </body>
+</html>

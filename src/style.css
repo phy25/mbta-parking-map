@@ -1,0 +1,271 @@
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: #f0e9e1;
+    overflow: hidden;
+}
+
+body, .mapboxgl-popup-content {
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+/* From Bootstrap */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    -webkit-clip-path: inset(50%);
+    clip-path: inset(50%);
+    border: 0;
+}
+
+#map-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+#map, #map-loading {
+    width: 100%;
+    height: 100%;
+}
+
+#map-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(255, 255, 255, 0.8) center center no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #1565C0;
+    /* height: auto; */ /* margin-bottom fix */
+}
+
+#map-loading > * {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.span-block {
+    display: inline-block;
+}
+
+#map-loading h1 {
+    font-size: 2em;
+}
+
+#map-loading p {
+    text-align: center;
+    line-height: 1.5;
+}
+
+#panel-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    pointer-events: none;
+}
+
+.mapboxgl-ctrl-attrib.mapboxgl-compact {
+    z-index: 20;
+}
+
+#panel-handle {
+    margin-top: 10vh;
+    font-size: 1.5rem;
+}
+
+#panel-handle button {
+    font-size: 2rem;
+    border: none;
+    line-height: 1;
+    vertical-align: top;
+    background: #FFF;
+    padding: 0.5rem 0.8rem;
+    box-shadow: #bbbbbbbb 0.2rem 0.2rem 0.4rem;
+    clip-path: inset(-0.5rem -0.5rem -0.5rem 0);
+    transition: padding-left 0.2s;
+    cursor: pointer;
+    pointer-events: auto;
+}
+
+#panel-handle button:hover {
+    transition: padding-left 0.2s;
+    padding-left: 1.3rem;
+    background: #BBDEFB;
+}
+
+#panel-handle button:focus-visible {
+    padding-left: 1.3rem;
+    clip-path: inset(-0.5rem -0.5rem -0.5rem -1px);
+    transition-duration: 0s;
+}
+
+#panel-handle button::before {
+    content: "\203A";
+}
+
+#panel-container.on #panel-handle button::before {
+    content: "\2039";
+}
+
+#panel {
+    background: #FFF;
+    width: 17em;
+    max-width: 50vw;
+    height: 100vh;
+    display: none;
+    box-shadow: #99999999 0.1rem 0 0.1rem;
+    overflow: auto;
+    box-sizing: border-box;
+    pointer-events: auto;
+}
+
+#panel > *:first-child {
+    margin-top: 1em;
+}
+
+#panel > * {
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+#panel hr {
+    margin: 1em 0;
+}
+
+#panel-container.on #panel {
+    display: block;
+}
+
+@media (orientation: portrait) {
+    #panel-container {
+        top: auto;
+        bottom: 0;
+        display: flex;
+        flex-direction: column-reverse;
+        justify-content: end;
+    }
+
+    #panel {
+        width: 100vw;
+        max-width: none;
+        height: 40vh;
+        max-height: 22.5em;
+        box-shadow: #99999999 0 -0.1rem 0.1rem;
+    }
+
+    #panel-handle {
+        margin-top: 0;
+        margin-left: 10vw;
+    }
+
+    #panel-handle button {
+        padding: 0 0.5rem 0.5rem 0.9rem; /* pretty magic number to cope with baseline :shrug: */
+        clip-path: inset(-0.5rem -0.5rem 0 -0.5rem);
+    }
+
+    #panel-handle button:hover {
+        transition: padding-bottom 0.2s;
+        padding-bottom: 1rem;
+        padding-left: 0.9rem;
+    }
+
+    #panel-handle button:focus-visible {
+        padding-bottom: 1rem;
+        padding-left: 0.9rem;
+        clip-path: inset(-0.5rem -0.5rem -1px -0.5rem);
+        transition-duration: 0s;
+    }
+
+    #panel-handle button::before {
+        display: inline-block;
+        writing-mode: tb;
+        content: "\2039";
+    }
+
+    #panel-container.on #panel-handle button::before {
+        content: "\203A";
+    }
+}
+
+/* Theme color from https://coolors.co/palette/e3f2fd-bbdefb-90caf9-64b5f6-42a5f5-2196f3-1e88e5-1976d2-1565c0-0d47a1 */
+
+a {
+    color: #0D47A1;
+}
+
+a:visited {
+    color: #64B5F6;
+}
+
+label[for] {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    color: #1565C0;
+}
+
+#cluster-color-bar {
+    display: flex;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    justify-content: space-between;
+    padding: 0.3em 0.4em;
+    line-height: 1;
+    height: 1em;
+}
+
+/*
+#lines option:checked::after {
+    content: "\2714";
+    display: inline-block;
+    margin-left: 0.5em;
+}
+*/
+
+footer {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    max-width: 50em;
+    font-weight: lighter;
+}
+
+a.footnote {
+    text-decoration: none;
+}
+
+/* https://www.abeautifulsite.net/posts/a-clever-way-to-style-the-mark-element/ */
+p:target {
+    background: linear-gradient(-100deg, hsla(48,92%,75%,.3), hsla(48,92%,75%,.7) 95%, hsla(48,92%,75%,.1));
+    padding: .2em;
+}
+
+.print-only-block {display: none;}
+footer.print-only-block {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #FFF;
+    padding: 0 1em;
+    line-height: 0.5;
+    font-size: 12px;
+}
+@media print {
+    #panel-container, .mapboxgl-ctrl-attrib-button, .mapboxgl-ctrl-group .mapboxgl-ctrl-geolocate {display: none;}
+    .print-only-block {display: block;}
+}
