@@ -18,9 +18,10 @@ if (!(
     ))) {
     const placeholderMapUrl = 'https://api.mapbox.com/styles/v1/'
     + config.styleId + '/static/' + config.lnglat[0] + ',' + config.lnglat[1] + ',' + config.zoom
-    + '/1280x1280?logo=false&access_token=' + config.webAccessToken;
+    + '/640x640?logo=false&access_token=' + config.webAccessToken;
     // Static Maps should not be bundled into our assets (for caching)
     mapLoading.style.backgroundImage = 'linear-gradient(90deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.8)), url(\'' + placeholderMapUrl + '\')';
+    mapLoading.style.backgroundColor = 'transparent';
 } else {
     console.log("Detected slow network, not loading placeholder image");
 }
