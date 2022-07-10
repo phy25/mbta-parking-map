@@ -11,6 +11,10 @@ body, .mapboxgl-popup-content {
     font-size: 16px;
 }
 
+.mapboxgl-popup-close-button {
+    font-size: 1.2em;
+}
+
 /* From Bootstrap */
 .sr-only {
     position: absolute;

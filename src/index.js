@@ -456,7 +456,7 @@ window.addEventListener('DOMContentLoaded', function() {
         map.on('click', 'parking_lots', (e) => {
             const popup = new mapboxgl.Popup()
                 .setLngLat(e.features[0].geometry.coordinates)
-                .setMaxWidth('30em')
+                .setMaxWidth('min(30em, 90vw)')
                 .setHTML("<p>" + e.features[0].properties.title + "</p>" +
                     "<p><strong>Daily fee</strong>: " + e.features[0].properties.daily_rate +
                     "<br><strong>Capacity</strong>: " + e.features[0].properties.capacity +
