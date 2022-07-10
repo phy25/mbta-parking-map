@@ -95,6 +95,7 @@ body, .mapboxgl-popup-content {
     vertical-align: top;
     background: #FFF;
     padding: 0.5rem 0.8rem;
+    margin: 0; /* remove weird 2px margin in Safari */
     box-shadow: #bbbbbbbb 0.2rem 0.2rem 0.4rem;
     clip-path: inset(-0.5rem -0.5rem -0.5rem 0);
     transition: padding-left 0.2s;
