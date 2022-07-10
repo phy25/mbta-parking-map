@@ -95,7 +95,6 @@ body, .mapboxgl-popup-content {
     vertical-align: top;
     background: #FFF;
     padding: 0.5rem 0.8rem;
-    box-sizing: border-box;
     box-shadow: #bbbbbbbb 0.2rem 0.2rem 0.4rem;
     clip-path: inset(-0.5rem -0.5rem -0.5rem 0);
     transition: padding-left 0.2s;
@@ -196,6 +195,7 @@ body, .mapboxgl-popup-content {
         display: inline-block;
         writing-mode: tb;
         content: "\2039";
+        width: 1em;
     }
 
     #panel-container.on #panel-handle button::before {
