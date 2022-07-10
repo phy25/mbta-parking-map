@@ -42,6 +42,19 @@ const getColorInterpolateArray = function(sortedValues, quantileStops) {
             }
         });
     } else {
+        if (sortedValues.length == 4) {
+            colorInterpolateArray.push(sortedValues[0]);
+            colorInterpolateArray.push(quantileStops[0][1]);
+
+            colorInterpolateArray.push(sortedValues[1]);
+            colorInterpolateArray.push(quantileStops[1][1]);
+
+            colorInterpolateArray.push(sortedValues[2]);
+            colorInterpolateArray.push(quantileStops[3][1]);
+
+            colorInterpolateArray.push(sortedValues[3]);
+            colorInterpolateArray.push(quantileStops[4][1]);
+        }
         if (sortedValues.length == 3) {
             colorInterpolateArray.push(sortedValues[0]);
             colorInterpolateArray.push(quantileStops[0][1]);
