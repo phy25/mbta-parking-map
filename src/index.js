@@ -126,6 +126,9 @@ window.addEventListener('DOMContentLoaded', function() {
         const geolocate_control = new mapboxgl.GeolocateControl();
         map.addControl(geolocate_control);
 
+        const navigation_control = new mapboxgl.NavigationControl();
+        map.addControl(navigation_control);
+
         const scale_control = new mapboxgl.ScaleControl({
             unit: 'imperial'
         });
