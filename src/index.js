@@ -108,6 +108,10 @@ window.addEventListener('DOMContentLoaded', function() {
         */
     });
 
+    window.addEventListener('beforeprint', function() {
+        adjustMapPadding();
+    });
+
     // Async load starts
 
     const bubble_img = new Image();

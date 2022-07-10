@@ -274,6 +274,18 @@ footer.print-only-block {
     font-size: 12px;
 }
 @media print {
-    #panel-container, .mapboxgl-ctrl-attrib-button, .mapboxgl-ctrl-group .mapboxgl-ctrl-geolocate {display: none;}
+    #panel-container,
+    .mapboxgl-ctrl-attrib-button,
+    .mapboxgl-ctrl-group .mapboxgl-ctrl-geolocate,
+    .mapboxgl-ctrl-group .mapboxgl-ctrl-zoom-in,
+    .mapboxgl-ctrl-group .mapboxgl-ctrl-zoom-out {
+        display: none;
+    }
+
+    /* Hack to remove double margin as one set of ctrl-group is hidden */
+    .mapboxgl-ctrl-top-right .mapboxgl-ctrl.mapboxgl-ctrl-group:nth-child(2) {
+        margin-top: 0;
+    }
+
     .print-only-block {display: block;}
 }
