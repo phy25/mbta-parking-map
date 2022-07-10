@@ -33,7 +33,15 @@ const getColorInterpolateArray = function(sortedValues, quantileStops) {
         return colorInterpolateArray;
     }
 
-    if (sortedValues.length > 3) {
+    let uniqueValues = [];
+    sortedValues.reduce((previous, current) => {
+        if (current !== previous) {
+            uniqueValues.push(current);
+        }
+        return current;
+    }, undefined);
+
+    if (uniqueValues.length > 3) {
         quantileStops.forEach(stop => {
             let stopAbs = quantile(sortedValues, stop[0]);
             if (colorInterpolateArray.length == 0 || stopAbs > colorInterpolateArray[colorInterpolateArray.length-2]) {
@@ -42,38 +50,25 @@ const getColorInterpolateArray = function(sortedValues, quantileStops) {
             }
         });
     } else {
-        if (sortedValues.length == 4) {
-            colorInterpolateArray.push(sortedValues[0]);
+        if (uniqueValues.length == 3) {
+            colorInterpolateArray.push(uniqueValues[0]);
             colorInterpolateArray.push(quantileStops[0][1]);
 
-            colorInterpolateArray.push(sortedValues[1]);
-            colorInterpolateArray.push(quantileStops[1][1]);
-
-            colorInterpolateArray.push(sortedValues[2]);
-            colorInterpolateArray.push(quantileStops[3][1]);
-
-            colorInterpolateArray.push(sortedValues[3]);
-            colorInterpolateArray.push(quantileStops[4][1]);
-        }
-        if (sortedValues.length == 3) {
-            colorInterpolateArray.push(sortedValues[0]);
-            colorInterpolateArray.push(quantileStops[0][1]);
-
-            colorInterpolateArray.push(sortedValues[1]);
+            colorInterpolateArray.push(uniqueValues[1]);
             colorInterpolateArray.push(quantileStops[2][1]);
 
-            colorInterpolateArray.push(sortedValues[2]);
+            colorInterpolateArray.push(uniqueValues[2]);
             colorInterpolateArray.push(quantileStops[4][1]);
         }
-        if (sortedValues.length == 2) {
-            colorInterpolateArray.push(sortedValues[0]);
+        if (uniqueValues.length == 2) {
+            colorInterpolateArray.push(uniqueValues[0]);
             colorInterpolateArray.push(quantileStops[0][1]);
 
-            colorInterpolateArray.push(sortedValues[1]);
+            colorInterpolateArray.push(uniqueValues[1]);
             colorInterpolateArray.push(quantileStops[4][1]);
         }
-        if (sortedValues.length == 1) {
-            colorInterpolateArray.push(sortedValues[0]);
+        if (uniqueValues.length == 1) {
+            colorInterpolateArray.push(uniqueValues[0]);
             colorInterpolateArray.push(quantileStops[2][1]);
         }
     }
