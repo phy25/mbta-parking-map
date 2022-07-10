@@ -68,8 +68,10 @@
       <div id="map-loading" aria-busy="true" aria-live="polite" aria-label="Loading MBTA Parking Map">
         <h1><%= htmlWebpackPlugin.options.title %></h1>
         <p><span class="span-block">Visualize transit-friendly parking lots</span> <span class="span-block">by rate and capacity</span></p>
+        <noscript><p><strong>You will need to enable Javascript to use this webpage.</strong></p></noscript>
       </div>
     </div>
+    <noscript><style>#map-container {display: block !important;} #panel-container {display: none;}</style></noscript>
     <footer class="print-only-block">
       <p>
         Data from <a target="_blank" href="https://www.mbta.com/developers/v3-api">MassDOT</a>.
