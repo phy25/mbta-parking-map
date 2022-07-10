@@ -1,6 +1,6 @@
 const config = require('./config.js');
 const fetch = require('node-fetch');
-const {getGeoJson} = require('./converter.js');
+const {getGeoJson} = require('./data-converter.js');
 const Bottleneck = require("bottleneck/es5");
 
 const ROUTES_TYPE_LIST = [0, 1, 2];
