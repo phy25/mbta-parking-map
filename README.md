@@ -10,7 +10,9 @@ You can:
 - View clustered data with min/max rate or capacity
 - Filter by transit lines
 
-## Additional licensing information
+## Licensing information
+
+Webapp hosted on [Vercel](https://vercel.com/).
 
 Map data downloaded during runtime is from [Mapbox](https://www.mapbox.com/about/maps/) and [OpenStreetMaps](https://www.openstreetmap.org/about/). We are not authorized to automatically cache map data during build time.
 
