@@ -65,7 +65,7 @@ module.exports = {
             templateParameters: {
                 'git_commit_hash':
                     require('child_process')
-                    .execSync('git rev-parse --short HEAD')
+                    .execSync('git rev-parse HEAD')
                     .toString()
                     .trim(),
             },
