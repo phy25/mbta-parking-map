@@ -4,6 +4,7 @@ jobs:
   publish-sentry:
     if: github.deployment.environment == 'Production'
     environment: Production
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: Create Sentry release
