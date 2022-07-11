@@ -2,7 +2,7 @@ const config = require('./config.js');
 const fetch = require('node-fetch');
 const {getGeoJson} = require('./data-converter.js');
 
-const JSON_URL = "https://api-v3.mbta.com/facilities?filter%5Btype%5D=PARKING_AREA&page%5Blimit%5D=5000&include=stop";
+const JSON_URL = "https://api-v3.mbta.com/facilities?filter%5Btype%5D=PARKING_AREA&page%5Blimit%5D=5000";
 
 // Based on https://httptoolkit.tech/blog/bundling-remote-scripts-with-webpack/
 module.exports = function() {
