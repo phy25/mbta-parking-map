@@ -479,7 +479,14 @@ window.addEventListener('DOMContentLoaded', function() {
                     "<br><strong>Capacity</strong>: " + e.features[0].properties.capacity +
                     "<br><strong>Owner</strong>: " + e.features[0].properties.owner +
                     "</p>" +
-                    '<p><a href="https://www.mbta.com/stops/'+ e.features[0].properties.stop_id + '" target="_blank">Stop Info</p>')
+                    '<p><a href="https://www.mbta.com/stops/'+ e.features[0].properties.stop_id + '" target="_blank">Stop Info</a></p>' +
+                    '<p>Navigate: <a href="https://www.google.com/maps/search/?api=1&query=' +
+                    encodeURIComponent(e.features[0].geometry.coordinates[1] + ',' + e.features[0].geometry.coordinates[0]) + '" target="_blank">Google Maps</a>, ' +
+                    '<a href="https://maps.apple.com/?ll=' +
+                    encodeURIComponent(e.features[0].geometry.coordinates[1] + ',' + e.features[0].geometry.coordinates[0]) + '&q=' +
+                    encodeURIComponent(e.features[0].properties.title) + '" target="_blank">Apple Maps</a>, ' +
+                    '<a href="geo:'+ e.features[0].geometry.coordinates[1] + ',' + e.features[0].geometry.coordinates[0] +'?q=' +
+                    encodeURIComponent(e.features[0].properties.title) + '">Geo URI</a></p>')
             .addTo(map);
 
             popup.getElement().addEventListener('keydown', function(event) {
