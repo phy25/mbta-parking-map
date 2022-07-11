@@ -86,8 +86,10 @@ window.addEventListener('DOMContentLoaded', function() {
     document.getElementById('map-container').style.display = 'block';
 
     let shouldOpenPanel = localStorage[NAMESPACE + 'Panel'] == 'yes';
+    const SHOW_PANEL_PIXEL_THRESHOLD = 720;
 
-    if (localStorage[NAMESPACE + 'Panel'] === undefined && window.innerHeight <= window.innerWidth) {
+    if (localStorage[NAMESPACE + 'Panel'] === undefined &&
+        (window.innerHeight > SHOW_PANEL_PIXEL_THRESHOLD || window.innerWidth > SHOW_PANEL_PIXEL_THRESHOLD)) {
         shouldOpenPanel = true;
     }
 
