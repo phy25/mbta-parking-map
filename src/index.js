@@ -1,3 +1,12 @@
+const NAMESPACE = 'mbtaParkingMap';
+
+Sentry.init({
+    dsn: "https://9ff52b5dde604a63b3af9d5cb8a83246@o71025.ingest.sentry.io/6563566",
+    release: NAMESPACE + "@" + document.body.dataset.version,
+    integrations: [new Sentry.BrowserTracing()],
+    tracesSampleRate: 0.2,
+});
+
 import "./style.css";
 import bubbleImage from './bubble.png';
 import config from './config.js';
@@ -6,7 +15,6 @@ import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from '
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
 const mbtaLinesJsonDownload = require('./data-mbta-lines.json.js');
 
-const NAMESPACE = 'mbtaParkingMap';
 const detailsMinZoom = 11;
 
 const mapLoading = document.getElementById('map-loading');
@@ -25,7 +33,6 @@ if (!(
 } else {
     console.log("Detected slow network, not loading placeholder image");
 }
-
 
 window.addEventListener('DOMContentLoaded', function() {
     mapboxgl.accessToken = config.webAccessToken;

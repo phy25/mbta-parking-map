@@ -7,6 +7,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 module.exports = {
     entry: {
         index: './src/index.js',
+        privacy: './src/privacy.html',
     },
     devServer: {
         static: './dist',
@@ -37,6 +38,13 @@ module.exports = {
                 test: /\.png$/i,
                 type: 'asset/resource',
             },
+            {
+                test: /privacy\.html$/i,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'privacy.html',
+                }
+            },
         ],
     },
     output: {
@@ -54,6 +62,13 @@ module.exports = {
             title: 'MBTA Parking Map',
             description: 'Visualize transit-friendly parking lots by rate and capacity.',
             template: 'src/index.ejs.html',
+            templateParameters: {
+                'git_commit_hash':
+                    require('child_process')
+                    .execSync('git rev-parse --short HEAD')
+                    .toString()
+                    .trim(),
+            },
             favicon: 'src/icon.png',
             meta: {
                 'viewport': 'width=device-width',
