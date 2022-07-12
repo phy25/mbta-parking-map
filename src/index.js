@@ -13,7 +13,7 @@ import "./style.css";
 import bubbleImage from './bubble.png';
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
-import {getUniqueColorsets, generateBubble} from './bubbleGen';
+import {getUniqueColorsets, getColorsetHash, generateBubble, getMapboxImageOption} from './bubbleGen';
 import "./privacy.html";
 
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
@@ -168,7 +168,18 @@ window.addEventListener('DOMContentLoaded', function() {
         bubble_img.src = bubbleImage;
 
         let uniqueColorsets = getUniqueColorsets([...stopsIdToLineColors.values()]);
-        // generateBubble(uniqueColorsets[0])
+        uniqueColorsets.forEach(colorset => {
+            let colorsetHash = getColorsetHash(colorset);
+            let bubbleImage = generateBubble(colorset);
+            map.addImage(colorsetHash, bubbleImage, getMapboxImageOption());
+        });
+
+        geoJson.features.forEach(f => {
+            let stop_id = f.properties.stop_id;
+            if (stop_id) {
+                f.properties.bubble_image_id = getColorsetHash(stopsIdToLineColors.get(stop_id));
+            }
+        });
     };
 
     const parkingDataLoadPromise = new Promise((resolve) => {
@@ -480,7 +491,7 @@ window.addEventListener('DOMContentLoaded', function() {
             filter: layerFilter,
             minzoom: detailsMinZoom,
             layout: {
-                'icon-image': 'bubble',
+                'icon-image': ['get', 'bubble_image_id'],
                 'text-field': markerLabelExp,
                 'text-offset': [0, 1.25],
                 'text-anchor': 'center',

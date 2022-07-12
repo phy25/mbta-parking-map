@@ -1,5 +1,5 @@
 const getColorsetHash = function(colorset) {
-    return colorset.map(t => (t || '').replace('#', '')).join('-');
+    return 'bubble-' + colorset.map(t => (t || '').replace('#', '')).join('-');
 };
 
 const getUniqueColorsets = function (allColorsets) {
@@ -13,11 +13,11 @@ const getUniqueColorsets = function (allColorsets) {
 const bubbleWidth = 100, bubbleHeight = 60, bubbleRadius = 29;
 
 const generateBubble = function (colorset) {
-    let canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     canvas.width = bubbleWidth;
     canvas.height = bubbleHeight;
 
-    let ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     // left
     ctx.beginPath();
     ctx.fillStyle = colorset[0];
@@ -43,7 +43,22 @@ const generateBubble = function (colorset) {
     ctx.closePath();
     ctx.fill();
 
-    console.log(canvas.toDataURL());
+    return ctx.getImageData(0, 0, bubbleWidth, bubbleHeight);
 }
 
-module.exports = {getUniqueColorsets, generateBubble};
+const bubbleStretchYAdjustment = 4, bubbleContentYBaselineAddition = 10, bubblePaddingX = 20, bubblePaddingY = 12;
+
+const getMapboxImageOption = function(){
+    return {
+        // radius = 14px *2
+        stretchX: [[bubbleHeight / 2, bubbleWidth - bubbleHeight / 2]],
+        stretchY: [[bubbleHeight / 2 - bubbleStretchYAdjustment, bubbleHeight / 2 + bubbleStretchYAdjustment]],
+        // This part of the image that can contain text ([x1, y1, x2, y2]):
+        content: [bubblePaddingX, bubblePaddingY, bubbleWidth - bubblePaddingX, bubbleHeight - bubblePaddingY + bubbleContentYBaselineAddition],
+        // 56 rather than 50 to deal with Roboto's hidden padding under baseline
+        pixelRatio: 2,
+        // sdf: true,
+    };
+};
+
+module.exports = {getUniqueColorsets, getColorsetHash, generateBubble, getMapboxImageOption};
