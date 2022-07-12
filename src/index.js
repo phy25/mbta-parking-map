@@ -266,18 +266,20 @@ window.addEventListener('DOMContentLoaded', function() {
             map.removeSource('parking_lots_clusters');
         }
 
-        map.addSource('parking_lots_clusters', {
-            type: 'geojson',
-            data: geoJson,
-            filter: layerFilter,
-            cluster: true,
-            clusterRadius: 50,
-            clusterProperties: {
-                'sum_daily_rate_min': ["+", ["get", "daily_rate_min"]],
-                'sum_daily_rate_max': ["+", ["get", "daily_rate_max"]],
-                'capacity': ["+", ["get", "capacity"]],
-            },
-        });
+        if (options['cluster-enabled']) {
+            map.addSource('parking_lots_clusters', {
+                type: 'geojson',
+                data: geoJson,
+                filter: layerFilter,
+                cluster: true,
+                clusterRadius: 50,
+                clusterProperties: {
+                    'sum_daily_rate_min': ["+", ["get", "daily_rate_min"]],
+                    'sum_daily_rate_max': ["+", ["get", "daily_rate_max"]],
+                    'capacity': ["+", ["get", "capacity"]],
+                },
+            });
+        }
 
         let colorValueList = [];
         let colorValueKey = false;
@@ -390,7 +392,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         const clusterColorBar = document.getElementById('cluster-color-bar');
-        if (colorInterpolateArray.length) {
+        if (colorInterpolateArray.length && options['cluster-enabled']) {
             // clusterColorBar.style.display = 'flex';
             clusterColorBar.style.backgroundImage = 'linear-gradient(90deg, ' + colorInterpolateArray.filter(s => (s + '').indexOf('#') === 0).join(', ') + ')';
             clusterColorBar.innerHTML = colorInterpolateArray
@@ -404,7 +406,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         document.getElementById('facilities-counter').textContent = colorValueList.length;
 
-        if (colorValueList.length) {
+        if (colorValueList.length && options['cluster-enabled']) {
             map.addLayer({
                 id: 'parking_lots_clusters',
                 type: 'circle',
@@ -480,7 +482,7 @@ window.addEventListener('DOMContentLoaded', function() {
             type: 'symbol',
             source: 'parking_lots',
             filter: layerFilter,
-            minzoom: detailsMinZoom,
+            minzoom: options['cluster-enabled'] ? detailsMinZoom : 0,
             layout: {
                 'icon-image': ['get', 'bubble_image_id'],
                 'text-field': markerLabelExp,
@@ -534,6 +536,11 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     };
 
+    document.getElementById('cluster-enabled').addEventListener('change', function(event){
+        Array.from(document.getElementById('cluster-size-radios').getElementsByTagName('input')).forEach(elem => {
+            elem.disabled = !this.checked;
+        });
+    });
     const formOptions = document.getElementById('form-options');
     const formOptionsChanged = function() {
         let formData = new FormData(formOptions);

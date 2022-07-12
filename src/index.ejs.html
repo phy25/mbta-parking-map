@@ -24,7 +24,12 @@
       <div id="panel" tabindex="0" role="region" aria-label="Options">
         <form id="form-options">
           <div style="display: flex; flex-wrap: wrap; gap: 1em 3em;">
-            <div>
+            <fieldset id="form-fieldset-cluster">
+              <legend>
+                <label>
+                  <input type="checkbox" id="cluster-enabled" name="cluster-enabled" checked /> Enable clustering
+                </label>
+              </legend>
               <label for="cluster-color">Cluster color&emsp14;/&emsp14;text</label>
               <div style="display: flex; flex-direction: column;">
                 <label><input type="radio" name="cluster-color" value="daily_rate_max" checked /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
@@ -33,12 +38,12 @@
               </div>
               <div id="cluster-color-bar" style="margin-bottom: 1em;"></div>
               <label for="cluster-size">Cluster size</label>
-              <div style="display: flex; flex-direction: column;">
+              <div id="cluster-size-radios" style="display: flex; flex-direction: column;">
                 <label><input type="radio" name="cluster-size" value="daily_rate_max" /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
                 <label><input type="radio" name="cluster-size" value="daily_rate_min" /> Average low daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
                 <label><input type="radio" name="cluster-size" value="capacity" checked /> Sum capacity</label>
               </div>
-            </div>
+            </fieldset>
             <div>
               <div style="display: flex; flex-direction: column; margin-bottom: 1em;">
                 <label><input type="checkbox" name="include-lt-20-capacity" /> Include &lt;20 spaces</label>
@@ -46,7 +51,7 @@
               </div>
               <div>
                 <label for="lines">Lines <button id="lines-select-all" style="margin-left: 0.5em;">Select All</button></label>
-                <select id="lines" name="lines" multiple style="min-height: 5em; height: 7.5em; min-width: 15em; resize: vertical;"></select>
+                <select id="lines" name="lines" multiple style="min-height: 5em; height: 10.5em; min-width: 15em; resize: vertical;"></select>
               </div>
               <p style="margin: 1em 0 0; font-size: 0.9em;"><em>Showing <span id="facilities-counter">…</span> daily public parking</em></p>
             </div>
