@@ -1,16 +1,19 @@
 const NAMESPACE = 'mbtaParkingMap';
 
-Sentry.init({
-    dsn: "https://9ff52b5dde604a63b3af9d5cb8a83246@o71025.ingest.sentry.io/6563566",
-    release: NAMESPACE + "@" + document.body.dataset.version,
-    integrations: [new Sentry.BrowserTracing()],
-    tracesSampleRate: 0.2,
-});
+if (!location.host.startsWith('localhost')) {
+    Sentry.init({
+        dsn: "https://9ff52b5dde604a63b3af9d5cb8a83246@o71025.ingest.sentry.io/6563566",
+        release: NAMESPACE + "@" + document.body.dataset.version,
+        integrations: [new Sentry.BrowserTracing()],
+        tracesSampleRate: 0.2,
+    });
+}
 
 import "./style.css";
 import bubbleImage from './bubble.png';
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
+import {getUniqueColorsets} from './bubbleGen';
 import "./privacy.html";
 
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
@@ -124,19 +127,6 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     // Async load starts
-
-    const bubble_img = new Image();
-
-    const imageLoadPromise = new Promise((resolve, reject) => {
-        bubble_img.addEventListener('load', function() {
-            resolve(this);
-        });
-        bubble_img.addEventListener('error', function() {
-            reject(this);
-        });
-        bubble_img.src = bubbleImage;
-    });
-
     const mapLoadPromise = new Promise((resolve, reject) => {
         const geolocate_control = new mapboxgl.GeolocateControl();
         map.addControl(geolocate_control);
@@ -155,23 +145,42 @@ window.addEventListener('DOMContentLoaded', function() {
             map.on('load', () => {
                 resolve();
             });
+            map.on('error', (err) => {
+                console.error("Mapbox error", err);
+                reject(err);
+            });
         }
     });
 
 
-    let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(),
+    let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(), stopsIdToLineColors = new Map(),
         linesJson = null, linesIdToStops = {};
 
-    const parkingDataLoadPromise = new Promise((resolve, reject) => {
+    const bubble_img = new Image();
+
+    const bubbleLoadPromise = new Promise((resolve, reject) => {
+        bubble_img.addEventListener('load', function() {
+            resolve(this);
+        });
+        bubble_img.addEventListener('error', function() {
+            reject(this);
+        });
+        bubble_img.src = bubbleImage;
+
+        console.log(getUniqueColorsets([...stopsIdToLineColors.values()]));
+    });
+
+    const parkingDataLoadPromise = new Promise((resolve) => {
         const parkingDownload = fetch(mbtaParkingJsonDownload);
         const linesDownload = fetch(mbtaLinesJsonDownload);
         parkingDownload
             .then(async response => {
                 geoJson = await response.json();
                 geoJson.features.forEach(f => {
-                    if (f.properties.stop_id) {
-                        stopsParkingLotCount[f.properties.stop_id] = (stopsParkingLotCount[f.properties.stop_id] || 0) + 1;
-                        stopsWithoutLines.set(f.properties.stop_id, true);
+                    let stop_id = f.properties.stop_id;
+                    if (stop_id) {
+                        stopsParkingLotCount[stop_id] = (stopsParkingLotCount[stop_id] || 0) + 1;
+                        stopsWithoutLines.set(stop_id, true);
                     }
                 });
             })
@@ -184,8 +193,8 @@ window.addEventListener('DOMContentLoaded', function() {
                 linesJson.push({
                     id: 'null',
                     name: 'Other services',
-                    color: '#000',
-                    textColor: '#FFF',
+                    color: '#000000',
+                    textColor: '#FFFFFF',
                     stops: [...stopsWithoutLines.keys()],
                 });
 
@@ -195,15 +204,27 @@ window.addEventListener('DOMContentLoaded', function() {
                     if (facilitiesSum) {
                         linesIdToStops[line.id] = line.stops || [];
                     }
+
+                    line.stops.forEach(stop_id => {
+                        if (stopsIdToLineColors.has(stop_id)) {
+                            if (stopsIdToLineColors.get(stop_id).indexOf(line.color) === -1) {
+                                stopsIdToLineColors.get(stop_id).push(line.color);
+                            }
+                        } else {
+                            stopsIdToLineColors.set(stop_id, [line.color]);
+                        }
+                    });
                 });
+
                 resolve();
-            })
-        );
+            }))
+            .then(bubbleLoadPromise);
     });
 
-    Promise.all([parkingDataLoadPromise, mapLoadPromise, imageLoadPromise]).then(function() {
-        dataLoaded();
-    });
+    Promise.all([parkingDataLoadPromise, mapLoadPromise, bubbleLoadPromise])
+        .then(function() {
+            dataLoaded();
+        });
 
     const paintLayers = function(options) {
         let filteredStops = [];
