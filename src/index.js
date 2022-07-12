@@ -1,16 +1,19 @@
 const NAMESPACE = 'mbtaParkingMap';
 
-Sentry.init({
-    dsn: "https://9ff52b5dde604a63b3af9d5cb8a83246@o71025.ingest.sentry.io/6563566",
-    release: NAMESPACE + "@" + document.body.dataset.version,
-    integrations: [new Sentry.BrowserTracing()],
-    tracesSampleRate: 0.2,
-});
+if (!location.host.startsWith('localhost')) {
+    Sentry.init({
+        dsn: "https://9ff52b5dde604a63b3af9d5cb8a83246@o71025.ingest.sentry.io/6563566",
+        release: NAMESPACE + "@" + document.body.dataset.version,
+        integrations: [new Sentry.BrowserTracing()],
+        tracesSampleRate: 0.2,
+    });
+}
 
 import "./style.css";
-import bubbleImage from './bubble.png';
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
+import {getUniqueColorsets, getColorsetHash, generateBubble, getMapboxImageOption} from './bubbleGen';
+import "./privacy.html";
 
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
 const mbtaLinesJsonDownload = require('./data-mbta-lines.json.js');
@@ -123,19 +126,6 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
     // Async load starts
-
-    const bubble_img = new Image();
-
-    const imageLoadPromise = new Promise((resolve, reject) => {
-        bubble_img.addEventListener('load', function() {
-            resolve(this);
-        });
-        bubble_img.addEventListener('error', function() {
-            reject(this);
-        });
-        bubble_img.src = bubbleImage;
-    });
-
     const mapLoadPromise = new Promise((resolve, reject) => {
         const geolocate_control = new mapboxgl.GeolocateControl();
         map.addControl(geolocate_control);
@@ -154,53 +144,90 @@ window.addEventListener('DOMContentLoaded', function() {
             map.on('load', () => {
                 resolve();
             });
+            map.on('error', (err) => {
+                console.error("Mapbox error", err);
+                reject(err);
+            });
         }
     });
 
 
-    let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(), linesJson = null, linesIdToStops = {};
+    let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(), stopsIdToLineColors = new Map(),
+        linesJson = null, linesIdToStops = {};
 
-    const parkingDataLoadPromise = new Promise((resolve, reject) => {
-        const delayedLinesDownload = fetch(mbtaLinesJsonDownload);
-        fetch(mbtaParkingJsonDownload)
+    const bubbleLoad = (resolve, reject) => {
+        let uniqueColorsets = getUniqueColorsets([...stopsIdToLineColors.values()]);
+        uniqueColorsets.forEach(colorset => {
+            let colorsetHash = getColorsetHash(colorset);
+            let bubbleImage = generateBubble(colorset);
+            map.addImage(colorsetHash, bubbleImage, getMapboxImageOption());
+        });
+
+        geoJson.features.forEach(f => {
+            let stop_id = f.properties.stop_id;
+            if (stop_id) {
+                f.properties.bubble_image_id = getColorsetHash(stopsIdToLineColors.get(stop_id));
+            }
+        });
+
+        resolve();
+    };
+
+    const parkingDataLoadPromise = new Promise((resolve) => {
+        const parkingDownload = fetch(mbtaParkingJsonDownload);
+        const linesDownload = fetch(mbtaLinesJsonDownload);
+        parkingDownload
             .then(async response => {
                 geoJson = await response.json();
                 geoJson.features.forEach(f => {
-                    if (f.properties.stop_id) {
-                        stopsParkingLotCount[f.properties.stop_id] = (stopsParkingLotCount[f.properties.stop_id] || 0) + 1;
-                        stopsWithoutLines.set(f.properties.stop_id, true);
+                    let stop_id = f.properties.stop_id;
+                    if (stop_id) {
+                        stopsParkingLotCount[stop_id] = (stopsParkingLotCount[stop_id] || 0) + 1;
+                        stopsWithoutLines.set(stop_id, true);
                     }
                 });
             })
-            .then(() => delayedLinesDownload.then(async response => {
-                    linesJson = await response.json();
-                    linesJson.forEach(line => {
-                        line.stops.forEach(stop_id => {stopsWithoutLines.delete(stop_id);});
-                    });
+            .then(() => linesDownload.then(async response => {
+                linesJson = await response.json();
+                linesJson.forEach(line => {
+                    line.stops.forEach(stop_id => {stopsWithoutLines.delete(stop_id);});
+                });
 
-                    linesJson.push({
-                        id: 'null',
-                        name: 'Other services',
-                        color: '#000',
-                        textColor: '#FFF',
-                        stops: [...stopsWithoutLines.keys()],
-                    });
+                linesJson.push({
+                    id: 'null',
+                    name: 'Other services',
+                    color: '#000000',
+                    textColor: '#FFFFFF',
+                    stops: [...stopsWithoutLines.keys()],
+                });
 
-                    linesJson.forEach(line => {
-                        let facilitiesSum = line.stops.reduce((sum, stop_id) => sum + (stopsParkingLotCount[stop_id] || 0), 0);
-                        line.facilitiesCount = facilitiesSum;
-                        if (facilitiesSum) {
-                            linesIdToStops[line.id] = line.stops || [];
+                linesJson.forEach(line => {
+                    let facilitiesSum = line.stops.reduce((sum, stop_id) => sum + (stopsParkingLotCount[stop_id] || 0), 0);
+                    line.facilitiesCount = facilitiesSum;
+                    if (facilitiesSum) {
+                        linesIdToStops[line.id] = line.stops || [];
+                    }
+
+                    line.stops.forEach(stop_id => {
+                        if (stopsIdToLineColors.has(stop_id)) {
+                            if (stopsIdToLineColors.get(stop_id).indexOf(line.color) === -1) {
+                                stopsIdToLineColors.get(stop_id).push(line.color);
+                            }
+                        } else {
+                            stopsIdToLineColors.set(stop_id, [line.color]);
                         }
                     });
-                    resolve();
-                })
-            );
+                });
+
+                resolve();
+            }))
+            .then(() => new Promise(bubbleLoad));
     });
 
-    Promise.all([parkingDataLoadPromise, mapLoadPromise, imageLoadPromise]).then(function() {
-        dataLoaded();
-    });
+    Promise.all([parkingDataLoadPromise, mapLoadPromise])
+        .then(function() {
+            dataLoaded();
+        });
 
     const paintLayers = function(options) {
         let filteredStops = [];
@@ -239,18 +266,20 @@ window.addEventListener('DOMContentLoaded', function() {
             map.removeSource('parking_lots_clusters');
         }
 
-        map.addSource('parking_lots_clusters', {
-            type: 'geojson',
-            data: geoJson,
-            filter: layerFilter,
-            cluster: true,
-            clusterRadius: 50,
-            clusterProperties: {
-                'sum_daily_rate_min': ["+", ["get", "daily_rate_min"]],
-                'sum_daily_rate_max': ["+", ["get", "daily_rate_max"]],
-                'capacity': ["+", ["get", "capacity"]],
-            },
-        });
+        if (options['cluster-enabled']) {
+            map.addSource('parking_lots_clusters', {
+                type: 'geojson',
+                data: geoJson,
+                filter: layerFilter,
+                cluster: true,
+                clusterRadius: 50,
+                clusterProperties: {
+                    'sum_daily_rate_min': ["+", ["get", "daily_rate_min"]],
+                    'sum_daily_rate_max': ["+", ["get", "daily_rate_max"]],
+                    'capacity': ["+", ["get", "capacity"]],
+                },
+            });
+        }
 
         let colorValueList = [];
         let colorValueKey = false;
@@ -363,7 +392,7 @@ window.addEventListener('DOMContentLoaded', function() {
         }
 
         const clusterColorBar = document.getElementById('cluster-color-bar');
-        if (colorInterpolateArray.length) {
+        if (colorInterpolateArray.length && options['cluster-enabled']) {
             // clusterColorBar.style.display = 'flex';
             clusterColorBar.style.backgroundImage = 'linear-gradient(90deg, ' + colorInterpolateArray.filter(s => (s + '').indexOf('#') === 0).join(', ') + ')';
             clusterColorBar.innerHTML = colorInterpolateArray
@@ -377,7 +406,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
         document.getElementById('facilities-counter').textContent = colorValueList.length;
 
-        if (colorValueList.length) {
+        if (colorValueList.length && options['cluster-enabled']) {
             map.addLayer({
                 id: 'parking_lots_clusters',
                 type: 'circle',
@@ -453,9 +482,9 @@ window.addEventListener('DOMContentLoaded', function() {
             type: 'symbol',
             source: 'parking_lots',
             filter: layerFilter,
-            minzoom: detailsMinZoom,
+            minzoom: options['cluster-enabled'] ? detailsMinZoom : 0,
             layout: {
-                'icon-image': 'bubble',
+                'icon-image': ['get', 'bubble_image_id'],
                 'text-field': markerLabelExp,
                 'text-offset': [0, 1.25],
                 'text-anchor': 'center',
@@ -507,6 +536,11 @@ window.addEventListener('DOMContentLoaded', function() {
         });
     };
 
+    document.getElementById('cluster-enabled').addEventListener('change', function(event){
+        Array.from(document.getElementById('cluster-size-radios').getElementsByTagName('input')).forEach(elem => {
+            elem.disabled = !this.checked;
+        });
+    });
     const formOptions = document.getElementById('form-options');
     const formOptionsChanged = function() {
         let formData = new FormData(formOptions);
@@ -521,16 +555,6 @@ window.addEventListener('DOMContentLoaded', function() {
     formOptions.addEventListener('change', formOptionsChanged);
 
     const dataLoaded = function() {
-        map.addImage('bubble', bubble_img, {
-            // radius = 14px *2
-            stretchX: [[28, 62]],
-            stretchY: [[24, 36]],
-            // This part of the image that can contain text ([x1, y1, x2, y2]):
-            content: [20, 10, 80, 56], // 56 rather than 50 to deal with Roboto's hidden padding under baseline
-            pixelRatio: 2,
-            // sdf: true,
-        });
-
         map.addSource('parking_lots', {
             'type': 'geojson',
             'data': geoJson
@@ -559,6 +583,15 @@ window.addEventListener('DOMContentLoaded', function() {
         event.preventDefault();
         Array.from(document.getElementById('lines').getElementsByTagName('option'))
             .forEach(elem => {elem.selected = true});
+
+        document.getElementById('lines').focus();
+        formOptionsChanged();
+    });
+
+    document.getElementById('lines-select-none').addEventListener('click', function(event) {
+        event.preventDefault();
+        Array.from(document.getElementById('lines').getElementsByTagName('option'))
+            .forEach(elem => {elem.selected = false});
 
         document.getElementById('lines').focus();
         formOptionsChanged();
