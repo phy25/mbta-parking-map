@@ -11,6 +11,7 @@ import "./style.css";
 import bubbleImage from './bubble.png';
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
+import "./privacy.html";
 
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
 const mbtaLinesJsonDownload = require('./data-mbta-lines.json.js');
@@ -158,11 +159,13 @@ window.addEventListener('DOMContentLoaded', function() {
     });
 
 
-    let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(), linesJson = null, linesIdToStops = {};
+    let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(),
+        linesJson = null, linesIdToStops = {};
 
     const parkingDataLoadPromise = new Promise((resolve, reject) => {
-        const delayedLinesDownload = fetch(mbtaLinesJsonDownload);
-        fetch(mbtaParkingJsonDownload)
+        const parkingDownload = fetch(mbtaParkingJsonDownload);
+        const linesDownload = fetch(mbtaLinesJsonDownload);
+        parkingDownload
             .then(async response => {
                 geoJson = await response.json();
                 geoJson.features.forEach(f => {
@@ -172,30 +175,30 @@ window.addEventListener('DOMContentLoaded', function() {
                     }
                 });
             })
-            .then(() => delayedLinesDownload.then(async response => {
-                    linesJson = await response.json();
-                    linesJson.forEach(line => {
-                        line.stops.forEach(stop_id => {stopsWithoutLines.delete(stop_id);});
-                    });
+            .then(() => linesDownload.then(async response => {
+                linesJson = await response.json();
+                linesJson.forEach(line => {
+                    line.stops.forEach(stop_id => {stopsWithoutLines.delete(stop_id);});
+                });
 
-                    linesJson.push({
-                        id: 'null',
-                        name: 'Other services',
-                        color: '#000',
-                        textColor: '#FFF',
-                        stops: [...stopsWithoutLines.keys()],
-                    });
+                linesJson.push({
+                    id: 'null',
+                    name: 'Other services',
+                    color: '#000',
+                    textColor: '#FFF',
+                    stops: [...stopsWithoutLines.keys()],
+                });
 
-                    linesJson.forEach(line => {
-                        let facilitiesSum = line.stops.reduce((sum, stop_id) => sum + (stopsParkingLotCount[stop_id] || 0), 0);
-                        line.facilitiesCount = facilitiesSum;
-                        if (facilitiesSum) {
-                            linesIdToStops[line.id] = line.stops || [];
-                        }
-                    });
-                    resolve();
-                })
-            );
+                linesJson.forEach(line => {
+                    let facilitiesSum = line.stops.reduce((sum, stop_id) => sum + (stopsParkingLotCount[stop_id] || 0), 0);
+                    line.facilitiesCount = facilitiesSum;
+                    if (facilitiesSum) {
+                        linesIdToStops[line.id] = line.stops || [];
+                    }
+                });
+                resolve();
+            })
+        );
     });
 
     Promise.all([parkingDataLoadPromise, mapLoadPromise, imageLoadPromise]).then(function() {
