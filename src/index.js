@@ -13,7 +13,7 @@ import "./style.css";
 import bubbleImage from './bubble.png';
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
-import {getUniqueColorsets} from './bubbleGen';
+import {getUniqueColorsets, generateBubble} from './bubbleGen';
 import "./privacy.html";
 
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
@@ -158,7 +158,7 @@ window.addEventListener('DOMContentLoaded', function() {
 
     const bubble_img = new Image();
 
-    const bubbleLoadPromise = new Promise((resolve, reject) => {
+    const bubbleLoad = (resolve, reject) => {
         bubble_img.addEventListener('load', function() {
             resolve(this);
         });
@@ -167,8 +167,9 @@ window.addEventListener('DOMContentLoaded', function() {
         });
         bubble_img.src = bubbleImage;
 
-        console.log(getUniqueColorsets([...stopsIdToLineColors.values()]));
-    });
+        let uniqueColorsets = getUniqueColorsets([...stopsIdToLineColors.values()]);
+        // generateBubble(uniqueColorsets[0])
+    };
 
     const parkingDataLoadPromise = new Promise((resolve) => {
         const parkingDownload = fetch(mbtaParkingJsonDownload);
@@ -218,10 +219,10 @@ window.addEventListener('DOMContentLoaded', function() {
 
                 resolve();
             }))
-            .then(bubbleLoadPromise);
+            .then(() => new Promise(bubbleLoad));
     });
 
-    Promise.all([parkingDataLoadPromise, mapLoadPromise, bubbleLoadPromise])
+    Promise.all([parkingDataLoadPromise, mapLoadPromise])
         .then(function() {
             dataLoaded();
         });
