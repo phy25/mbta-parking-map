@@ -10,7 +10,6 @@ if (!location.host.startsWith('localhost')) {
 }
 
 import "./style.css";
-import bubbleImage from './bubble.png';
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
 import {getUniqueColorsets, getColorsetHash, generateBubble, getMapboxImageOption} from './bubbleGen';
@@ -156,17 +155,7 @@ window.addEventListener('DOMContentLoaded', function() {
     let geoJson = null, stopsParkingLotCount = {}, stopsWithoutLines = new Map(), stopsIdToLineColors = new Map(),
         linesJson = null, linesIdToStops = {};
 
-    const bubble_img = new Image();
-
     const bubbleLoad = (resolve, reject) => {
-        bubble_img.addEventListener('load', function() {
-            resolve(this);
-        });
-        bubble_img.addEventListener('error', function() {
-            reject(this);
-        });
-        bubble_img.src = bubbleImage;
-
         let uniqueColorsets = getUniqueColorsets([...stopsIdToLineColors.values()]);
         uniqueColorsets.forEach(colorset => {
             let colorsetHash = getColorsetHash(colorset);
@@ -180,6 +169,8 @@ window.addEventListener('DOMContentLoaded', function() {
                 f.properties.bubble_image_id = getColorsetHash(stopsIdToLineColors.get(stop_id));
             }
         });
+
+        resolve();
     };
 
     const parkingDataLoadPromise = new Promise((resolve) => {
@@ -557,16 +548,6 @@ window.addEventListener('DOMContentLoaded', function() {
     formOptions.addEventListener('change', formOptionsChanged);
 
     const dataLoaded = function() {
-        map.addImage('bubble', bubble_img, {
-            // radius = 14px *2
-            stretchX: [[28, 62]],
-            stretchY: [[24, 36]],
-            // This part of the image that can contain text ([x1, y1, x2, y2]):
-            content: [20, 10, 80, 56], // 56 rather than 50 to deal with Roboto's hidden padding under baseline
-            pixelRatio: 2,
-            // sdf: true,
-        });
-
         map.addSource('parking_lots', {
             'type': 'geojson',
             'data': geoJson
