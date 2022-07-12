@@ -587,4 +587,13 @@ window.addEventListener('DOMContentLoaded', function() {
         document.getElementById('lines').focus();
         formOptionsChanged();
     });
+
+    document.getElementById('lines-select-none').addEventListener('click', function(event) {
+        event.preventDefault();
+        Array.from(document.getElementById('lines').getElementsByTagName('option'))
+            .forEach(elem => {elem.selected = false});
+
+        document.getElementById('lines').focus();
+        formOptionsChanged();
+    });
 });
