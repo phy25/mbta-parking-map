@@ -1,18 +1,18 @@
-// https://color.adobe.com/SSA-gradient-color-theme-15656355/
+// https://coolors.co/palette/7ddf64-c0df85-deb986-db6c79-ed4d6e
 const QUANTILE_STOPS_GTR = [
-    [0, "#0DB312"],
-    [0.25, "#9CDB16"],
-    [0.5, "#FFE000"],
-    [0.75, "#E8A00C"],
-    [1, "#FF700D"]
+    [0, "#7DDF64"],
+    [0.25, "#C0DF85"],
+    [0.5, "#DEB986"],
+    [0.75, "#DB6C79"],
+    [1, "#ED4D6E"]
 ];
 
 const QUANTILE_STOPS_RTG = [
-    [0, "#FF700D"],
-    [0.25, "#E8A00C"],
-    [0.5, "#FFE000"],
-    [0.75, "#9CDB16"],
-    [1, "#0DB312"]
+    [0, "#ED4D6E"],
+    [0.25, "#DB6C79"],
+    [0.5, "#DEB986"],
+    [0.75, "#C0DF85"],
+    [1, "#7DDF64"]
 ];
 
 const quantile = (sorted, q) => {
