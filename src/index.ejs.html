@@ -30,18 +30,22 @@
                   <input type="checkbox" id="cluster-enabled" name="cluster-enabled" checked /> Enable clustering
                 </label>
               </legend>
-              <label for="cluster-color">Cluster color&emsp14;/&emsp14;text</label>
+
+              <label id="label-cluster-color-on" for="cluster-color">Cluster color&emsp14;/&emsp14;text</label>
+              <label id="label-cluster-color-off" for="cluster-color" style="display: none;">Label text</label>
               <div style="display: flex; flex-direction: column;">
                 <label><input type="radio" name="cluster-color" value="daily_rate_max" checked /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
                 <label><input type="radio" name="cluster-color" value="daily_rate_min" /> Average low daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
                 <label><input type="radio" name="cluster-color" value="capacity" /> Sum capacity</label>
               </div>
-              <div id="cluster-color-bar" style="margin-bottom: 1em;"></div>
-              <label for="cluster-size">Cluster size</label>
-              <div id="cluster-size-radios" style="display: flex; flex-direction: column;">
-                <label><input type="radio" name="cluster-size" value="daily_rate_max" /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
-                <label><input type="radio" name="cluster-size" value="daily_rate_min" /> Average low daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
-                <label><input type="radio" name="cluster-size" value="capacity" checked /> Sum capacity</label>
+              <div id="form-cluster-on-only">
+                <div id="cluster-color-bar" style="margin-bottom: 1em;"></div>
+                <label for="cluster-size">Cluster size</label>
+                <div id="cluster-size-radios" style="display: flex; flex-direction: column;">
+                  <label><input type="radio" name="cluster-size" value="daily_rate_max" /> Average high daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
+                  <label><input type="radio" name="cluster-size" value="daily_rate_min" /> Average low daily rate <a href="#footnote-daily-rate" title="See footnote" class="footnote">*</a></label>
+                  <label><input type="radio" name="cluster-size" value="capacity" checked /> Sum capacity</label>
+                </div>
               </div>
             </fieldset>
             <div>

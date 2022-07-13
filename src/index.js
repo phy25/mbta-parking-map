@@ -536,9 +536,15 @@ window.addEventListener('DOMContentLoaded', function() {
     };
 
     document.getElementById('cluster-enabled').addEventListener('change', function(event){
-        Array.from(document.getElementById('cluster-size-radios').getElementsByTagName('input')).forEach(elem => {
-            elem.disabled = !this.checked;
-        });
+        if (this.checked) {
+            document.getElementById('form-cluster-on-only').style.display = 'block';
+            document.getElementById('label-cluster-color-on').style.display = 'block';
+            document.getElementById('label-cluster-color-off').style.display = 'none';
+        } else {
+            document.getElementById('form-cluster-on-only').style.display = 'none';
+            document.getElementById('label-cluster-color-on').style.display = 'none';
+            document.getElementById('label-cluster-color-off').style.display = 'block';
+        }
     });
     const formOptions = document.getElementById('form-options');
     const formOptionsChanged = function() {
