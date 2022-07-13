@@ -1,0 +1,18 @@
+body, .mapboxgl-popup-content {
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
+/* Theme color from https://coolors.co/palette/e3f2fd-bbdefb-90caf9-64b5f6-42a5f5-2196f3-1e88e5-1976d2-1565c0-0d47a1 */
+a {
+    color: #0D47A1;
+}
+
+a:visited {
+    color: #64B5F6;
+}
+
+h1 {
+    color: #1565C0;
+    font-size: 2em;
+}

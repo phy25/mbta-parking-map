@@ -13,7 +13,6 @@ import "./style.css";
 import config from './config.js';
 import {getColorInterpolateArray, QUANTILE_STOPS_GTR, QUANTILE_STOPS_RTG} from './colorGen';
 import {getUniqueColorsets, getColorsetHash, generateBubble, getMapboxImageOption} from './bubbleGen';
-import "./privacy.html";
 
 const mbtaParkingJsonDownload = require('./data-mbta-parking.json.js');
 const mbtaLinesJsonDownload = require('./data-mbta-lines.json.js');

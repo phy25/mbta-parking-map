@@ -7,6 +7,7 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 module.exports = {
     entry: {
         index: './src/index.js',
+        privacy: './src/privacy.js',
     },
     module: {
         rules: [
@@ -55,6 +56,7 @@ module.exports = {
             filename: "[name].[contenthash].css",
         }),
         new HtmlWebpackPlugin({
+            filename: 'index.html',
             title: 'MBTA Parking Map',
             description: 'Visualize transit-friendly parking lots by rate and capacity.',
             template: 'src/index.ejs.html',
@@ -72,7 +74,20 @@ module.exports = {
             scriptLoading: 'blocking',
             inject: 'body',
             xhtml: true,
-        })
+            chunks: ['index'],
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'privacy.html',
+            title: 'MBTA Parking Map',
+            template: 'src/privacy.ejs.html',
+            meta: {
+                'viewport': 'width=device-width',
+            },
+            scriptLoading: 'blocking',
+            inject: 'body',
+            xhtml: true,
+            chunks: ['privacy'],
+        }),
     ],
     optimization: {
         minimizer: [
